@@ -1,0 +1,69 @@
+Q1. Modify class GradeBook as follows:
+a. Include a second-string data member that represents the course instructor’s name.
+b. Provide a set function to change the instructor’s name and a get function to retrieve it.
+c. Modify the constructor to specify course name and instructor name parameters.
+d. Modify function displayMessage to output the welcome message and course name,
+then the string "This course is presented by: " followed by the instructor’s name.
+Use your modified class in main function that demonstrates the class’s new capabilities.
+
+
+Ans: 
+#include <string>
+#include <iostream>
+using namespace std;
+
+class GradeBook {
+public:
+    explicit GradeBook(string courseName, string instructorName); 
+    void setCourseName(string courseName); 
+    string getCourseName() const; 
+    void setInstructorName(string instructorName); 
+    string getInstructorName() const; 
+    void displayMessage() const; 
+    
+private:
+    string courseName; 
+    string instructorName; 
+}; // end class GradeBook
+
+// Constructor implementation
+GradeBook::GradeBook(string name, string instructor) : courseName(name), instructorName(instructor) {}
+
+// setCourseName implementation
+void GradeBook::setCourseName(string name) {
+    courseName = name;
+}
+
+// getCourseName implementation
+string GradeBook::getCourseName() const {
+    return courseName;
+}
+
+// setInstructorName implementation
+void GradeBook::setInstructorName(string instructor) {
+    instructorName = instructor;
+}
+
+// getInstructorName implementation
+string GradeBook::getInstructorName() const {
+    return instructorName;
+}
+
+// displayMessage implementation
+void GradeBook::displayMessage() const {
+    cout << "Welcome to the grade book for\n" << getCourseName() << "!" << endl;
+    cout << "This course is presented by: " << getInstructorName() << endl;
+}
+
+// main function to demonstrate the new capabilities
+int main(void) {
+    GradeBook myGradeBook("CS360 Programming in C and C++", "Professor Alex Yang");
+    myGradeBook.displayMessage();
+    
+    // Demonstrating the ability to change instructor's name
+    myGradeBook.setInstructorName("Professor James");
+    cout << "\nAfter instructor change:" << endl;
+    myGradeBook.displayMessage();
+
+    return 0;
+}
