@@ -1,0 +1,121 @@
+Q3. While exercising, you can use a heart rate monitor to see that your heart rate stays within a safe range suggested by your trainers and doctors. According to the American Heart Association (AHA) (www.americanheart.org/presenter.jhtml?identifier=4736),
+the formula for calculating your maximum heart rate in beats per minute is 220 minus your age in years. Your target heart rate is a range that is 50-85% of your maximum heart rate. [Note: These formulas are estimates provided by the AHA. Maximum and target heart rates may vary based on the health, fitness and gender of the individual. Always consult a physician or qualified health care professional before beginning or modifying an exercise program.]. Create a class called HeartRates. The class attributes should include the person’s first name, last name and date of birth (consisting of separate attributes for the month, day and year of birth). Your class should have a constructor that receives this data as parameters. For each attribute provide set and get functions. The class also should include a function getAge that calculates and returns the person’s age (in years), a function getMaxiumumHeartRate that calculates and returns the person’s maximum heart rate and a function getTargetHeartRate that calculates and returns the person’s target heart rate. Since you do not yet know how to obtain the current date from the computer, function getAge should prompt the user to enter the current month, day and year before calculating the person’s age. Write an application that prompts for the person’s information, instantiates an object of class HeartRates and prints the information from that object—including the person’s first name, last name and date of birth—then calculates and prints the person’s age in (years), maximum heart rate and target-heart-rate range.
+
+
+
+Ans: 
+#include <iostream>
+#include <string>
+using namespace std;
+
+class HeartRates {
+public:
+    HeartRates(string firstName, string lastName, int birthMonth, int birthDay, int birthYear)
+    : firstName(firstName), lastName(lastName), birthMonth(birthMonth), birthDay(birthDay), birthYear(birthYear) {}
+
+    // Setters
+    void setFirstName(string fName) {
+        firstName = fName;
+    }
+
+    void setLastName(string lName) {
+        lastName = lName;
+    }
+
+    void setBirthMonth(int month) {
+        birthMonth = month;
+    }
+
+    void setBirthDay(int day) {
+        birthDay = day;
+    }
+
+    void setBirthYear(int year) {
+        birthYear = year;
+    }
+
+    // Getters
+    string getFirstName() const {
+        return firstName;
+    }
+
+    string getLastName() const {
+        return lastName;
+    }
+
+    int getBirthMonth() const {
+        return birthMonth;
+    }
+
+    int getBirthDay() const {
+        return birthDay;
+    }
+
+    int getBirthYear() const {
+        return birthYear;
+    }
+
+    int getAge() const {
+        int currentYear, currentMonth, currentDay;
+        cout << "Enter the current year: ";
+        cin >> currentYear;
+        cout << "Enter the current month (number): ";
+        cin >> currentMonth;
+        cout << "Enter the current day: ";
+        cin >> currentDay;
+
+        int age = currentYear - birthYear;
+        if (birthMonth > currentMonth || (birthMonth == currentMonth && birthDay > currentDay)) {
+            age--;
+        }
+        return age;
+    }
+
+    int getMaximumHeartRate(int age) const {
+        return 220 - age;
+    }
+
+    void getTargetHeartRate(int& lowerBound, int& upperBound, int age) const {
+        int maxHeartRate = getMaximumHeartRate(age);
+        lowerBound = static_cast<int>(maxHeartRate * 0.50);
+        upperBound = static_cast<int>(maxHeartRate * 0.85);
+    }
+
+private:
+    string firstName;
+    string lastName;
+    int birthMonth;
+    int birthDay;
+    int birthYear;
+};
+
+// Application to demonstrate the HeartRates class
+int main() {
+    string firstName, lastName;
+    int month, day, year;
+
+    cout << "Enter first name: ";
+    cin >> firstName;
+    cout << "Enter last name: ";
+    cin >> lastName;
+    cout << "Enter birth month (number): ";
+    cin >> month;
+    cout << "Enter birth day: ";
+    cin >> day;
+    cout << "Enter birth year: ";
+    cin >> year;
+
+    HeartRates person(firstName, lastName, month, day, year);
+
+    int age = person.getAge();
+    int lowerBound, upperBound;
+    person.getTargetHeartRate(lowerBound, upperBound, age);
+
+    cout << "\nInformation for " << person.getFirstName() << " " << person.getLastName() << ":\n";
+    cout << "Date of Birth: " << person.getBirthMonth() << "/" << person.getBirthDay() << "/" << person.getBirthYear() << "\n";
+    cout << "Age: " << age << "\n";
+    cout << "Maximum Heart Rate: " << person.getMaximumHeartRate(age) << "\n";
+    cout << "Target Heart Rate Range: " << lowerBound << " - " << upperBound << " beats per minute\n";
+
+    return 0;
+}
