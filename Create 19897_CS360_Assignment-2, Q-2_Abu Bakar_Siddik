@@ -1,0 +1,76 @@
+Q2. Create a class called Date that includes three pieces of information as data members—a month (type int), a day (type int) and a year (type int). Your class should have a constructor with three parameters that uses the parameters to initialize the three data members. Assume that the values provided for the year and day are correct but ensure that the month value is in the range 1-12; if it isn’t, set the month to 1. Provide a set and a get function for each data member. Provide a member function displayDate that displays the month, day and year separated by forward slashes (/). Write a test program that demonstrates class Date’s capabilities.
+
+
+Ans: 
+#include <iostream>
+using namespace std;
+
+class Date {
+public:
+    Date(int month, int day, int year); //Constructor with parameter 
+    void setMonth(int month); 
+    int getMonth() const; 
+    void setDay(int day); 
+    int getDay() const; 
+    void setYear(int year); 
+    int getYear() const; 
+    void displayDate() const; 
+
+private:
+    int month;
+    int day;
+    int year;
+};
+
+Date::Date(int m, int d, int y) : day(d), year(y) {
+    setMonth(m); // Validate and set the month
+}
+
+void Date::setMonth(int m) {
+    month = (m >= 1 && m <= 12) ? m : 1; // Ensures month is within the range 1-12
+}
+
+int Date::getMonth() const {
+    return month;
+}
+
+void Date::setDay(int d) {
+    day = d; 
+}
+
+int Date::getDay() const {
+    return day;
+}
+
+void Date::setYear(int y) {
+    year = y;
+}
+
+int Date::getYear() const {
+    return year;
+}
+
+void Date::displayDate() const {
+    cout << month << "/" << day << "/" << year << endl;
+}
+
+// Test program
+int main(void) {
+    Date date1(12, 25, 2021); // Valid date
+    Date date2(0, 15, 2022); // Invalid month, should be set to 1
+
+    cout << "Date 1: ";
+    date1.displayDate();
+    cout << "Date 2: ";
+    date2.displayDate();
+
+    // Demonstrating set functions
+    date2.setMonth(2);
+    date2.setDay(28);
+    date2.setYear(2022);
+
+    cout << "Date 2 after modifications: ";
+    date2.displayDate();
+
+    return 0;
+}
