@@ -1,0 +1,138 @@
+Q2. Create class IntegerSet for which each object can hold integers in the range 0 through 100. Represent the set internally as a vector of bool values. Element a[i] is true if integer i is in the set. Element a[j] is false if integer j is not in the set. The default constructor initializes a set to the so-called "empty set," i.e., a set for which all elements contain false.
+a. Provide member functions for the common set operations. For example, provide a unionOfSets member function that creates a third set that is the set- theoretic union of two existing sets (i.e., an element of the result is set to true if that element is true in either or both of the existing sets, and an element of the result is set to false if that element is false in each of the existing sets).
+
+b. Provide an intersectionOfSets member function which creates a third set which is the set theoretic intersection of two existing sets (i.e., an element of the result is set to false if that element is false in either or both of the existing sets, and an element of the result is set to true if that element is true in each of the existing sets).
+
+c. Provide an insertElement member function that places a new integer k into a set by setting a[k] to true. Provide a deleteElement member function that deletes integer m by setting a[m] to false.
+
+d. Provide a printSet member function that prints a set as a list of numbers separated by spaces. Print only those elements that are present in the set (i.e., their position in the vector has a value of true). Print --- for an empty set.
+
+e. Provide an isEqualTo member function that determines whether two sets are equal.
+
+f. Provide an additional constructor that receives an array of integers and the size of that array and uses the array to initialize a set object. 
+
+Now write a main program to test your IntegerSet class. Instantiate several IntegerSet objects. Test that all your member functions work properly.
+
+
+
+Ans:
+#include <iostream>
+#include <vector>
+
+class IntegerSet {
+public:
+    // Default constructor initializes a set to the "empty set"
+    IntegerSet() : set(101, false) {}
+
+    // Constructor that initializes a set from an array of integers
+    IntegerSet(const int arr[], int size) : set(101, false) {
+        for (int i = 0; i < size; ++i) {
+            if (arr[i] >= 0 && arr[i] <= 100) {
+                set[arr[i]] = true;
+            }
+        }
+    }
+
+    // Creates a union of two sets
+    IntegerSet unionOfSets(const IntegerSet& other) const {
+        IntegerSet unionSet;
+        for (int i = 0; i <= 100; ++i) {
+            unionSet.set[i] = set[i] || other.set[i];
+        }
+        return unionSet;
+    }
+
+    // Creates an intersection of two sets
+    IntegerSet intersectionOfSets(const IntegerSet& other) const {
+        IntegerSet intersectionSet;
+        for (int i = 0; i <= 100; ++i) {
+            intersectionSet.set[i] = set[i] && other.set[i];
+        }
+        return intersectionSet;
+    }
+
+    // Inserts a new integer into the set
+    void insertElement(int k) {
+        if (k >= 0 && k <= 100) {
+            set[k] = true;
+        }
+    }
+
+    // Deletes an integer from the set
+    void deleteElement(int m) {
+        if (m >= 0 && m <= 100) {
+            set[m] = false;
+        }
+    }
+
+    // Prints the set
+    void printSet() const {
+        bool isEmpty = true;
+        for (int i = 0; i <= 100; ++i) {
+            if (set[i]) {
+                std::cout << i << " ";
+                isEmpty = false;
+            }
+        }
+        if (isEmpty) {
+            std::cout << "---"; // Print --- for an empty set
+        }
+        std::cout << std::endl;
+    }
+
+    // Determines whether two sets are equal
+    bool isEqualTo(const IntegerSet& other) const {
+        for (int i = 0; i <= 100; ++i) {
+            if (set[i] != other.set[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    std::vector<bool> set;
+};
+
+int main(void) {
+    // Test the IntegerSet class
+    IntegerSet set1;
+    IntegerSet set2;
+
+    set1.insertElement(1);
+    set1.insertElement(3);
+    set1.insertElement(5);
+
+    set2.insertElement(2);
+    set2.insertElement(3);
+    set2.insertElement(6);
+
+    std::cout << "Set 1: ";
+    set1.printSet();
+
+    std::cout << "Set 2: ";
+    set2.printSet();
+
+    IntegerSet unionSet = set1.unionOfSets(set2);
+    std::cout << "Union of Set 1 and Set 2: ";
+    unionSet.printSet();
+
+    IntegerSet intersectionSet = set1.intersectionOfSets(set2);
+    std::cout << "Intersection of Set 1 and Set 2: ";
+    intersectionSet.printSet();
+
+    // Test equality
+    if (set1.isEqualTo(set2)) {
+        std::cout << "Set 1 and Set 2 are equal." << std::endl;
+    } else {
+        std::cout << "Set 1 and Set 2 are not equal." << std::endl;
+    }
+
+    // Initialize a set with an array
+    int arr[] = {0, 1, 2, 99};
+    IntegerSet set3(arr, 4);
+    std::cout << "Set 3 (initialized with array): ";
+    set3.printSet();
+
+    return 0;
+}
