@@ -1,0 +1,161 @@
+Q2) Develop class Polynomial. The internal representation of a Polynomial is an array of terms. Each term contains a coefficient and an exponent, e.g., the term 2𝑥^4 has the coefficient 2 and the exponent 4. Develop a complete class containing proper constructor and destructor functions as well as set and get functions. The class should also provide the following overloaded operator capabilities:
+a. Overload the addition operator (+) to add two Polynomials. b. Overload the subtraction operator (-) to subtract two Polynomials.
+c. Overload the assignment operator to assign one Polynomial to another.
+d. Overload the multiplication operator (*) to multiply two Polynomials.
+e. Overload the addition assignment operator (+=), subtraction assignment operator (-=), and multiplication assignment operator (*=).
+
+
+
+Ans: 
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+class Polynomial {
+public:
+    // A helper struct to represent a term in the polynomial
+    struct Term {
+        int coefficient;
+        int exponent;
+        
+        // Constructor for convenience
+        Term(int c = 0, int e = 0) : coefficient(c), exponent(e) {}
+        
+        // Comparison operator to sort and manage terms
+        bool operator<(const Term& other) const {
+            return exponent > other.exponent; // Higher exponents first
+        }
+    };
+
+    // Default constructor
+    Polynomial() {}
+
+    // Copy constructor
+    Polynomial(const Polynomial& other) : terms(other.terms) {}
+
+    // Destructor
+    ~Polynomial() {}
+
+    // Assignment operator
+    Polynomial& operator=(const Polynomial& rhs) {
+        if (this != &rhs) {
+            terms = rhs.terms;
+        }
+        return *this;
+    }
+
+    // Addition operator
+    Polynomial operator+(const Polynomial& rhs) const {
+        Polynomial result = *this; // Start with a copy of the first polynomial
+        for (const auto& term : rhs.terms) {
+            result.addTerm(term.coefficient, term.exponent);
+        }
+        return result;
+    }
+
+    // Subtraction operator
+    Polynomial operator-(const Polynomial& rhs) const {
+        Polynomial result = *this; // Start with a copy of the first polynomial
+        for (const auto& term : rhs.terms) {
+            result.addTerm(-term.coefficient, term.exponent);
+        }
+        return result;
+    }
+
+    // Multiplication operator
+    Polynomial operator*(const Polynomial& rhs) const {
+        Polynomial result;
+        for (const auto& term1 : terms) {
+            for (const auto& term2 : rhs.terms) {
+                result.addTerm(term1.coefficient * term2.coefficient, term1.exponent + term2.exponent);
+            }
+        }
+        return result;
+    }
+
+    // Addition assignment operator
+    Polynomial& operator+=(const Polynomial& rhs) {
+        *this = *this + rhs;
+        return *this;
+    }
+
+    // Subtraction assignment operator
+    Polynomial& operator-=(const Polynomial& rhs) {
+        *this = *this - rhs;
+        return *this;
+    }
+
+    // Multiplication assignment operator
+    Polynomial& operator*=(const Polynomial& rhs) {
+        *this = *this * rhs;
+        return *this;
+    }
+
+    // Function to add a term to the polynomial
+    void addTerm(int coefficient, int exponent) {
+        // First, try to find a term with the same exponent
+        auto it = std::find_if(terms.begin(), terms.end(), [exponent](const Term& term) {
+            return term.exponent == exponent;
+        });
+
+        if (it != terms.end()) {
+            // Term with the same exponent found, add coefficients
+            it->coefficient += coefficient;
+            // If the coefficient becomes 0, remove the term
+            if (it->coefficient == 0) {
+                terms.erase(it);
+            }
+        } else {
+            // No term with the same exponent, add a new term
+            terms.push_back(Term(coefficient, exponent));
+        }
+
+        // Sort the terms by exponent in descending order
+        std::sort(terms.begin(), terms.end());
+    }
+
+    // Function to output the polynomial
+    void print() const {
+        for (size_t i = 0; i < terms.size(); ++i) {
+            std::cout << (terms[i].coefficient > 0 && i != 0 ? "+" : "")
+                      << terms[i].coefficient << "x^" << terms[i].exponent << " ";
+        }
+        std::cout << std::endl;
+    }
+
+private:
+    std::vector<Term> terms; // The polynomial terms
+};
+
+int main() {
+    Polynomial p1, p2;
+    p1.addTerm(2, 2); // p1 = 2x^2
+    p1.addTerm(3, 1); // p1 = 2x^2 + 3x^1
+    p2.addTerm(1, 1); // p2 = 1x^1
+    p2.addTerm(4, 0); // p2 = 1x^1 + 4x^0
+
+    Polynomial p3 = p1 + p2;
+    std::cout << "p1 + p2: ";
+    p3.print();
+
+    Polynomial p4 = p1 - p2;
+    std::cout << "p1 - p2: ";
+    p4.print();
+
+    Polynomial p5 = p1 * p2;
+    std::cout << "p1 * p2: ";
+    p5.print();
+
+    p1 += p2;
+    std::cout << "p1 += p2: ";
+    p1.print();
+
+    p1 -= p2;
+    std::cout << "p1 -= p2 (restoring p1): ";
+    p1.print();
+
+    p1 *= p2;
+    std::cout << "p1 *= p2: ";
+    p1.print();
+    return 0;
+}
