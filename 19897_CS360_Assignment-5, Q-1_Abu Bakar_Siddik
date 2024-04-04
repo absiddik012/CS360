@@ -1,0 +1,79 @@
+Q1. Package-delivery services, such as FedEx®, DHL® and UPS®, offer a number of different shipping options, each with specific costs associated. Create an inheritance hierarchy to represent various types of packages. Use class Package as the base class of the hierarchy, then include classes TwoDayPackage and OvernightPackage that derive from Package.
+Base class Package should include data members representing the name, address, city, state and ZIP code for both the sender and the recipient of the package, in addition to data members that store the weight (in ounces) and cost per ounce to ship the package. Package’s constructor should initialize these data members. Ensure that the weight and cost per ounce contain positive values. Package should provide a public member function calculateCost that returns a double indicating the cost associated with shipping the package. Package’s calculateCost function should determine the cost by multiplying the weight by the cost per ounce. Derived class TwoDayPackage should inherit the functionality of base class Package, but also include a data member that represents a flat fee that the shipping company charges for two-day-delivery service. TwoDayPackage’s constructor should receive a value to initialize this data member. TwoDayPackage should redefine member function calculateCost so that it computes the shipping cost by adding the flat fee to the weight-based cost calculated by base class Package’s calculateCost function. Class OvernightPackage should inherit directly from class Package and contain an additional data member representing an additional fee per ounce charged for overnight-delivery service. OvernightPackage should redefine member function calculateCost so that it adds the additional fee per ounce to the standard cost per ounce before calculating the shipping cost. Write a main program that creates objects of each type of Package and tests member function calculateCost.
+
+
+
+Ans:
+#include <iostream>
+#include <cmath>
+#include <string>
+
+using namespace std;
+
+class Package {
+protected:
+    string senderName, senderAddress, senderCity, senderState, senderZIP;
+    string recipientName, recipientAddress, recipientCity, recipientState, recipientZIP;
+    double weight, costPerOunce;
+
+public:
+    Package(string sName, string sAddress, string sCity, string sState, string sZIP,
+            string rName, string rAddress, string rCity, string rState, string rZIP,
+            double wt, double cost)
+        : senderName(sName), senderAddress(sAddress), senderCity(sCity), senderState(sState), senderZIP(sZIP),
+          recipientName(rName), recipientAddress(rAddress), recipientCity(rCity), recipientState(rState), recipientZIP(rZIP),
+          weight((wt > 0) ? wt : throw invalid_argument("Weight must be positive.")),
+          costPerOunce((cost > 0) ? cost : throw invalid_argument("Cost per ounce must be positive.")) {}
+
+    virtual double calculateCost() const {
+        return weight * costPerOunce;
+    }
+};
+
+class TwoDayPackage : public Package {
+private:
+    double flatFee;
+
+public:
+    TwoDayPackage(string sName, string sAddress, string sCity, string sState, string sZIP,
+                  string rName, string rAddress, string rCity, string rState, string rZIP,
+                  double wt, double cost, double fee)
+        : Package(sName, sAddress, sCity, sState, sZIP, rName, rAddress, rCity, rState, rZIP, wt, cost),
+          flatFee(fee) {}
+
+    double calculateCost() const override {
+        return Package::calculateCost() + flatFee;
+    }
+};
+
+class OvernightPackage : public Package {
+private:
+    double additionalFeePerOunce;
+
+public:
+    OvernightPackage(string sName, string sAddress, string sCity, string sState, string sZIP,
+                     string rName, string rAddress, string rCity, string rState, string rZIP,
+                     double wt, double cost, double additionalFee)
+        : Package(sName, sAddress, sCity, sState, sZIP, rName, rAddress, rCity, rState, rZIP, wt, cost),
+          additionalFeePerOunce(additionalFee) {}
+
+    double calculateCost() const override {
+        return weight * (costPerOunce + additionalFeePerOunce);
+    }
+};
+int main() {
+    Package package("John Doe", "123 Elm St", "Smalltown", "TX", "12345",
+                    "Jane Smith", "456 Oak St", "Anothertown", "TX", "67890",
+                    10, 0.5);
+    TwoDayPackage twoDay("John Doe", "123 Elm St", "Smalltown", "TX", "12345",
+                         "Jane Smith", "456 Oak St", "Anothertown", "TX", "67890",
+                         10, 0.5, 2.0);
+    OvernightPackage overnight("John Doe", "123 Elm St", "Smalltown", "TX", "12345",
+                               "Jane Smith", "456 Oak St", "Anothertown", "TX", "67890",
+                               10, 0.5, 0.25);
+    cout << "Standard Package Cost: $" << package.calculateCost() << endl;
+    cout << "Two Day Package Cost: $" << twoDay.calculateCost() << endl;
+    cout << "Overnight Package Cost: $" << overnight.calculateCost() << endl;
+
+    return 0;
+}
