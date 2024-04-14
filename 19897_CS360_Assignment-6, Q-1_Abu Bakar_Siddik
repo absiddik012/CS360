@@ -1,0 +1,241 @@
+Q1. Using classes, design an online address book to keep track of the names, addresses,
+phone numbers, and dates of birth of family members, close friends, and certain business
+associates. Your program should be able to handle a maximum of 500 entries.
+
+a. Design the class dateType was designed to implement the date in a program, but the member function setDate and the constructor do not check whether the date is valid before storing the date in the member variables. Rewrite the definitions of the function setDate and the constructor so that the values for the month, day, and year are checked before storing the date into the member variables. Add a member function, isLeapYear, to check whether a year is a leap year. Moreover, write a test program to test your class.
+
+b. Define a class, addressType, that can store a street address, city, state, and ZIP code. Use the appropriate functions to print and store the address. Also, use constructors to automatically initialize the member variables.
+
+c. Define a class extPersonType using the class personType as follows, the class dateType, and the class addressType. Add a member variable to this class to classify the person as a family member, friend, or business associate. Also, add a member variable to store the phone number. Add (or override) the functions to print and store the appropriate information. Use constructors to automatically initialize the member variables.
+
+d. Define the class addressBookType using the previously defined classes. An object of the type addressBookType should be able to process a maximum of 500 entries. The program should perform the following operations:
+(i) Load the data into the address book from a disk.
+(ii) Sort the address book by last name.
+(iii) Search for a person by last name.
+(iv) Print the address, phone number, and date of birth (if it exists) of a given person.
+(v) Print the names of the people whose birthdays are in a given month.
+(vi) Print the names of all of the people between two last names.
+(vii) Depending on the user’s request, print the names of all family members, friends, or business associates.
+#include <string>
+using namespace std;
+class personType{
+public:
+void print() const;
+//Function to output the first name and last name
+//in the form firstName lastName.
+void setName(string first, string last);
+//Function to set firstName and lastName according
+//to the parameters.
+//Postcondition: firstName = first; lastName = last;
+string getFirstName() const;
+//Function to return the first name.
+//Postcondition: The value of firstName is returned.
+string getLastName() const;
+//Function to return the last name.
+//Postcondition: The value of lastName is returned.
+personType(string first = "", string last = "");
+//Constructor
+//Sets firstName and lastName according to the parameters.
+//The default values of the parameters are null strings.
+//Postcondition: firstName = first; lastName = last;
+private:
+string firstName; //variable to store the first name
+string lastName; //variable to store the last name
+};
+void personType::print() const{
+cout << firstName << " " << lastName;
+}
+void personType::setName(string first, string last){
+firstName = first;
+lastName = last;
+}
+string personType::getFirstName() const{return firstName;}
+string personType::getLastName() const{return lastName;}
+//constructor
+personType::personType(string first, string last){
+firstName = first;
+lastName = last;
+}
+
+
+
+
+
+
+Ans:
+
+
+
+
+#include <iostream>
+#include <string>
+#include <array>
+
+using namespace std;
+
+
+//a
+class dateType {
+public:
+    void setDate(int month, int day, int year);
+    bool isLeapYear(int year) const;
+    void printDate() const;
+    dateType(int month = 1, int day = 1, int year = 1900);
+
+private:
+    int dMonth, dDay, dYear;
+};
+
+void dateType::setDate(int month, int day, int year) {
+    if (year >= 1900 && year <= 2100) {
+        dYear = year;
+    } else {
+        dYear = 1900;
+    }
+
+    if (month >= 1 && month <= 12) {
+        dMonth = month;
+    } else {
+        dMonth = 1;
+    }
+
+    bool leap = isLeapYear(dYear);
+    int daysInMonth = 31;
+
+    switch (dMonth) {
+    case 4: case 6: case 9: case 11:
+        daysInMonth = 30;
+        break;
+    case 2:
+        daysInMonth = leap ? 29 : 28;
+        break;
+    }
+
+    if (day >= 1 && day <= daysInMonth) {
+        dDay = day;
+    } else {
+        dDay = 1;
+    }
+}
+
+void dateType::printDate() const {
+    cout << dMonth << "-" << dDay << "-" << dYear;
+}
+
+bool dateType::isLeapYear(int year) const {
+    return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+}
+
+dateType::dateType(int month, int day, int year) {
+    setDate(month, day, year);
+}
+
+class personType {
+public:
+    void print() const;
+    void setName(string first, string last);
+    string getFirstName() const;
+    string getLastName() const;
+    personType(string first = "", string last = "");
+
+private:
+    string firstName;
+    string lastName;
+};
+
+void personType::print() const {
+    cout << firstName << " " << lastName;
+}
+
+void personType::setName(string first, string last) {
+    firstName = first;
+    lastName = last;
+}
+
+string personType::getFirstName() const {
+    return firstName;
+}
+
+string personType::getLastName() const {
+    return lastName;
+}
+
+personType::personType(string first, string last) : firstName(first), lastName(last) {}
+
+
+
+//b
+class addressType {
+public:
+    void printAddress() const;
+    addressType(string street = "", string city = "", string state = "", string zip = "");
+
+private:
+    string streetAddress, city, state, zipCode;
+};
+
+void addressType::printAddress() const {
+    cout << streetAddress << ", " << city << ", " << state << " " << zipCode << endl;
+}
+
+addressType::addressType(string street, string city, string state, string zip)
+    : streetAddress(street), city(city), state(state), zipCode(zip) {}
+
+
+
+//c
+class extPersonType : public personType {
+public:
+    extPersonType(string first = "", string last = "", string phone = "", string type = "")
+        : personType(first, last), phoneNumber(phone), relationship(type) {}
+
+    void printPerson() const {
+        print(); // Print name
+        cout << ", Phone: " << phoneNumber << ", Relationship: " << relationship << endl;
+    }
+
+private:
+    string phoneNumber;
+    string relationship; // Family, Friend, Business
+    dateType birthDate;
+    addressType address;
+};
+
+
+
+
+//d
+class addressBookType {
+public:
+    addressBookType() : numberOfEntries(0) {}
+
+    void addPerson(const extPersonType& person) {
+        if (numberOfEntries < 500) {
+            addressBook[numberOfEntries++] = person;
+        }
+    }
+
+    void printAll() const {
+        for (int i = 0; i < numberOfEntries; i++) {
+            addressBook[i].printPerson();
+        }
+    }
+
+private:
+    array<extPersonType, 500> addressBook;
+    int numberOfEntries;
+};
+
+int main() {
+    addressBookType myAddressBook;
+    extPersonType person1("John", "Doe", "555-1234", "Friend");
+    extPersonType person2("Jane", "Smith", "555-5678", "Family");
+
+    myAddressBook.addPerson(person1);
+    myAddressBook.addPerson(person2);
+
+    // Now printing all persons in the address book
+    myAddressBook.printAll();
+
+    return 0;
+}
