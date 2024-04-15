@@ -60,21 +60,18 @@ lastName = last;
 
 
 
-
-
 Ans:
-
 
 
 
 #include <iostream>
 #include <string>
 #include <array>
+#include <algorithm>
 
 using namespace std;
 
-
-//a
+// Date Type class
 class dateType {
 public:
     void setDate(int month, int day, int year);
@@ -92,25 +89,17 @@ void dateType::setDate(int month, int day, int year) {
     } else {
         dYear = 1900;
     }
-
     if (month >= 1 && month <= 12) {
         dMonth = month;
     } else {
         dMonth = 1;
     }
-
     bool leap = isLeapYear(dYear);
     int daysInMonth = 31;
-
     switch (dMonth) {
-    case 4: case 6: case 9: case 11:
-        daysInMonth = 30;
-        break;
-    case 2:
-        daysInMonth = leap ? 29 : 28;
-        break;
+        case 4: case 6: case 9: case 11: daysInMonth = 30; break;
+        case 2: daysInMonth = leap ? 29 : 28; break;
     }
-
     if (day >= 1 && day <= daysInMonth) {
         dDay = day;
     } else {
@@ -118,18 +107,44 @@ void dateType::setDate(int month, int day, int year) {
     }
 }
 
-void dateType::printDate() const {
-    cout << dMonth << "-" << dDay << "-" << dYear;
-}
-
 bool dateType::isLeapYear(int year) const {
     return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
+}
+
+void dateType::printDate() const {
+    cout << dMonth << "-" << dDay << "-" << dYear;
 }
 
 dateType::dateType(int month, int day, int year) {
     setDate(month, day, year);
 }
 
+// Address Type class
+class addressType {
+public:
+    void printAddress() const;
+    void setAddress(string street, string city, string state, string zip);
+    addressType(string street = "", string city = "", string state = "", string zip = "");
+
+private:
+    string streetAddress, city, state, zipCode;
+};
+
+void addressType::printAddress() const {
+    cout << streetAddress << ", " << city << ", " << state << " " << zipCode << endl;
+}
+
+void addressType::setAddress(string street, string city, string state, string zip) {
+    streetAddress = street;
+    city = city;
+    state = state;
+    zipCode = zip;
+}
+
+addressType::addressType(string street, string city, string state, string zip)
+    : streetAddress(street), city(city), state(state), zipCode(zip) {}
+
+// Person Type class
 class personType {
 public:
     void print() const;
@@ -162,36 +177,23 @@ string personType::getLastName() const {
 
 personType::personType(string first, string last) : firstName(first), lastName(last) {}
 
-
-
-//b
-class addressType {
-public:
-    void printAddress() const;
-    addressType(string street = "", string city = "", string state = "", string zip = "");
-
-private:
-    string streetAddress, city, state, zipCode;
-};
-
-void addressType::printAddress() const {
-    cout << streetAddress << ", " << city << ", " << state << " " << zipCode << endl;
-}
-
-addressType::addressType(string street, string city, string state, string zip)
-    : streetAddress(street), city(city), state(state), zipCode(zip) {}
-
-
-
-//c
+// Extended Person Type class
 class extPersonType : public personType {
 public:
-    extPersonType(string first = "", string last = "", string phone = "", string type = "")
-        : personType(first, last), phoneNumber(phone), relationship(type) {}
+    extPersonType(string first = "", string last = "", string phone = "", string type = "",
+                  string street = "", string city = "", string state = "", string zip = "",
+                  int month = 1, int day = 1, int year = 1900)
+        : personType(first, last), phoneNumber(phone), relationship(type),
+          birthDate(month, day, year), address(street, city, state, zip) {}
 
     void printPerson() const {
         print(); // Print name
         cout << ", Phone: " << phoneNumber << ", Relationship: " << relationship << endl;
+        cout << "Address: ";
+        address.printAddress();
+        cout << "Birth Date: ";
+        birthDate.printDate();
+        cout << endl;
     }
 
 private:
@@ -201,10 +203,7 @@ private:
     addressType address;
 };
 
-
-
-
-//d
+// Address Book Type class
 class addressBookType {
 public:
     addressBookType() : numberOfEntries(0) {}
@@ -221,21 +220,40 @@ public:
         }
     }
 
+    void sortByName() {
+        sort(addressBook.begin(), addressBook.begin() + numberOfEntries, [](const extPersonType& a, const extPersonType& b) {
+            return a.getLastName() < b.getLastName();
+        });
+    }
+
+    void findByLastName(const string& lastName) const {
+        auto it = find_if(addressBook.begin(), addressBook.begin() + numberOfEntries, [&lastName](const extPersonType& person) {
+            return person.getLastName() == lastName;
+        });
+        if (it != addressBook.end()) {
+            it->printPerson();
+        } else {
+            cout << "No entry found for last name: " << lastName << endl;
+        }
+    }
+
 private:
     array<extPersonType, 500> addressBook;
     int numberOfEntries;
 };
 
+// Main Function
 int main() {
     addressBookType myAddressBook;
-    extPersonType person1("John", "Doe", "555-1234", "Friend");
-    extPersonType person2("Jane", "Smith", "555-5678", "Family");
+    extPersonType person1("John", "Doe", "555-1234", "Friend", "1234 Elm St", "Smalltown", "ST", "12345", 1, 1, 1990);
+    extPersonType person2("Jane", "Smith", "555-5678", "Family", "5678 Oak St", "Bigcity", "BC", "67890", 6, 15, 1985);
 
     myAddressBook.addPerson(person1);
     myAddressBook.addPerson(person2);
 
-    // Now printing all persons in the address book
     myAddressBook.printAll();
+    myAddressBook.sortByName();
+    myAddressBook.findByLastName("Smith");
 
     return 0;
 }
